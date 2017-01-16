@@ -1,38 +1,100 @@
-language: cpp
+matrix:
+    include:
+        # Linux Trusty builds
+        - os: linux
+          dist: trusty
+          sudo: required
+          language: cpp
+          compiler: gcc
+          env: TRAVIS_BUILD_TYPE=Debug
 
-sudo: required
-dist: trusty
-osx_image: xcode7.3
-cache: ccache
+        - os: linux
+          dist: trusty
+          sudo: required
+          language: cpp
+          compiler: gcc
+          env: TRAVIS_BUILD_TYPE=Release
 
-# Travis CI VM OSs
-os:
-    - linux
-    - osx
+        - os: linux
+          dist: trusty
+          sudo: required
+          language: cpp
+          compiler: clang
+          env: TRAVIS_BUILD_TYPE=Debug
 
-# Travis CI build matrix components
-compiler:
-    - gcc
-    - clang
+        - os: linux
+          dist: trusty
+          sudo: required
+          language: cpp
+          compiler: clang
+          env: TRAVIS_BUILD_TYPE=Release
 
-env:
-    - TRAVIS_BUILD_TYPE=Debug
-    - TRAVIS_BUILD_TYPE=Release
+        # Xcode7.3 builds (El Capitan 10.11)
+        - os: osx
+          osx_image: xcode7.3
+          sudo: required
+          language: cpp
+          compiler: clang
+          env: TRAVIS_BUILD_TYPE=Debug
 
+        - os: osx
+          osx_image: xcode7.3
+          sudo: required
+          language: cpp
+          compiler: clang
+          env: TRAVIS_BUILD_TYPE=Release
+
+        - os: osx
+          osx_image: xcode7.3
+          sudo: required
+          language: cpp
+          compiler: gcc
+          env: TRAVIS_BUILD_TYPE=Debug
+
+        - os: osx
+          osx_image: xcode7.3
+          sudo: required
+          language: cpp
+          compiler: gcc
+          env: TRAVIS_BUILD_TYPE=Release
+
+        # Xcode8.2 builds (Sierra 10.12)
+        - os: osx
+          osx_image: xcode8.2
+          sudo: required
+          language: cpp
+          compiler: clang
+          env: TRAVIS_BUILD_TYPE=Debug
+
+        - os: osx
+          osx_image: xcode8.2
+          sudo: required
+          language: cpp
+          compiler: clang
+          env: TRAVIS_BUILD_TYPE=Release
+
+        - os: osx
+          osx_image: xcode8.2
+          sudo: required
+          language: cpp
+          compiler: gcc
+          env: TRAVIS_BUILD_TYPE=Debug
+
+        - os: osx
+          osx_image: xcode8.2
+          sudo: required
+          language: cpp
+          compiler: gcc
+          env: TRAVIS_BUILD_TYPE=Release
+
+cache:
+    ccache: true
+
+# Travis CI build lifecycle
 before_install:
-    # Update CMake to version >3.4
-    # Linux
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget http://www.cmake.org/files/v3.4/cmake-3.4.3.tar.gz;                                fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xzf cmake-3.4.3.tar.gz;                                                            fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd cmake-3.4.3/;                                                                        fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./configure;                                                                            fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make;                                                                                   fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo make install;                                                                      fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo update-alternatives --install /usr/bin/cmake cmake /usr/local/bin/cmake 1 --force; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd ..;                                                                                  fi
-    # macOS
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update;                               fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew outdated cmake || brew upgrade cmake; fi
+    # Update package managers
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get -qq update;  fi
+    - if [ "$TRAVIS_OS_NAME" == "osx"   ]; then brew update;              fi
 
     # Use ccache also for clang and clang++ on linux
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then if [ "$CC" == "clang" ];    then sudo ln -s ../../bin/ccache /usr/lib/ccache/clang;   fi; fi
@@ -43,6 +105,12 @@ before_install:
     # Install ccache on osx
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ccache;                               fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export PATH="/usr/local/opt/ccache/libexec:$PATH"; fi
+
+    # Install dependency: OpenCV
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew tap homebrew/science;                         fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then /usr/bin/yes | pip uninstall numpy || true;        fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install opencv3;                              fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force opencv3;                         fi
 
     # Print some more system information after installing all build tools
     - echo "-------------------- BEGIN SYSTEM INFORMATION --------------------"
