@@ -1,6 +1,6 @@
-#include "AutoCanny/Autocanny.h"
-
 #include <opencv2/imgproc/imgproc.hpp>
+
+#include "AutoCanny/Autocanny.h"
 
 
 void CumSum(const cv::Mat& histogram, cv::Mat& cumsum)
