@@ -25,11 +25,9 @@ make
 Once the library is installed, add to your project `CMakeLists.txt`
 ~~~cmake
 ...
-find_package(OpenCV    REQUIRED)
 find_package(AutoCanny REQUIRED)
 ...
-target_link_libraries(<target> AutoCanny
-                               ${OpenCV_LIBS})
+target_link_libraries(<target> AutoCanny)
 ...
 ~~~
 
